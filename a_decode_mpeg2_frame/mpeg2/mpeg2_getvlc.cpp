@@ -1,7 +1,7 @@
 /*!
 	@file		MPEG2_getvlc.cpp
 	@author		Robert Lluís, december 2014
-	@brief		Copied and modified from MPEG
+	@brief		Based on MPEG
 */
 
 #include "mpeg2_getvlc.h"

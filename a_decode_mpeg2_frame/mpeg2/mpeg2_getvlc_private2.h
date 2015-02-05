@@ -1,7 +1,7 @@
 /*!
 	@file		mpeg2_getvlc_private2.h
 	@author		Robert Lluís, december 2014
-	@brief		Copied and modified from MPEG
+	@brief		Based on MPEG
 */
 #ifndef __MPEG_GET_VLC_PRIVATE_2_H__
 #define __MPEG_GET_VLC_PRIVATE_2_H__

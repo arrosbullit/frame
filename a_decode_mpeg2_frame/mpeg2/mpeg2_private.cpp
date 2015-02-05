@@ -1,7 +1,7 @@
 /*!
 	@file		mpeg2_private.cpp
 	@author		Robert Lluís, december 2014
-	@brief		Copied and modified from MPEG
+	@brief		Based on MPEG
 */
 #include "mpeg2_private.h"
 #include <stdio.h>

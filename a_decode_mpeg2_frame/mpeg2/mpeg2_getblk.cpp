@@ -1,7 +1,7 @@
 /*!
 	@file		MPEG2_getblk.cpp
 	@author		Robert Lluís, december 2014
-	@brief		Copied and modified from MPEG
+	@brief		Based on MPEG
 	
 */
 

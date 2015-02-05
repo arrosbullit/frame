@@ -1,7 +1,7 @@
 /*!
 	@file		mpeg2_dec.cpp
 	@author		Robert Lluís, december 2014
-	@brief		Copied and modified from MPEG
+	@brief		Based on MPEG
 */
 #include "mpeg2_private.h"
 #include "mpeg2_dec.h"

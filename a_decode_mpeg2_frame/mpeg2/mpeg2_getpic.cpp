@@ -1,7 +1,7 @@
 /*!
 	@file		MPEG2_getpic.cpp
 	@author		Robert Lluís, december 2014
-	@brief		Copied and modified from MPEG
+	@brief		Based on MPEG
 	@note		bits: is set at the module entry and used module wide
 				MBA: macroblock address. Macroblock idx in reading order.
 	

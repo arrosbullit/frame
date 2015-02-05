@@ -1,7 +1,7 @@
 /*!
 	@file		MPEG2_getpic.h
 	@author		Robert Lluís, december 2014
-	@brief		Copied and modified from MPEG
+	@brief		Based on MPEG
 */
 #ifndef __MPEG2_GET_PIC_H__
 #define __MPEG2_GET_PIC_H__
