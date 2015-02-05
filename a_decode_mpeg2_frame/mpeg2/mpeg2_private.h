@@ -1,8 +1,7 @@
 /*!
 	@file		mpeg2_private.h
 	@author		Robert Lluís, december 2014
-	@brief		Copied and modified from: 
-				1996 MPEG Software Simulation Group.
+	@brief		Copied and modified from MPEG
 */
 #ifndef __MPEG2_DECODER_PRIVATE_H__
 #define __MPEG2_DECODER_PRIVATE_H__

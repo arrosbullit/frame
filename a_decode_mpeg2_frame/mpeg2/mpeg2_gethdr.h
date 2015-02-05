@@ -1,8 +1,7 @@
 /*!
 	@file		mpeg2_gethdr.h
 	@author		Robert Lluís, december 2014
-	@brief		Copied and modified from: 
-				1996 MPEG Software Simulation Group.
+	@brief		Copied and modified from MPEG
 */
 #ifndef __MPEG2_GET_HDR_H__
 #define __MPEG2_GET_HDR_H__

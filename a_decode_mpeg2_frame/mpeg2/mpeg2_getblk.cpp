@@ -1,9 +1,7 @@
 /*!
 	@file		MPEG2_getblk.cpp
 	@author		Robert Lluís, december 2014
-	@brief		Copied and modified from: 
-				getblk.c 
-				1996 MPEG Software Simulation Group.
+	@brief		Copied and modified from MPEG
 	
 */
 
