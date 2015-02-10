@@ -60,13 +60,22 @@ static void Clear_Options();
 static void Print_Options();
 #endif
 
+void printArguments(int argc, char *argv[])
+{
+	int i;
+	for(i = 0; i < argc; i++){
+		printf("%s\n", argv[i]);
+	}
+}
+
 int main(argc,argv)
 int argc;
 char *argv[];
 {
   int ret, code;
   //FILE *robDebugFile
-
+  int i;
+  printArguments(argc, argv);
   ML_openFile("ref.log", "wb");
 
   Clear_Options();

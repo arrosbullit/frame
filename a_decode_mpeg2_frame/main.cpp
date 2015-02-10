@@ -6,7 +6,8 @@
 
 using namespace std;
 
-#define FILE_NAME "test.m2v"
+//#define FILE_NAME "test.m2v"
+#define FILE_NAME "/home/robert/eclipse_workspace/f_lnx_extract_img_from_ts_v2/extracted_pic.m2v"
 
 int main()
 {
