@@ -499,18 +499,20 @@ static void addToThumbnail(int comp, int cc, int pos)
 	// Pseudo IDCT
 	val = d->block[comp][0];
 	//printf("1 debug val: %d\n", val);
-	//val = (int) ((double) val * 0.1231 - 0.3344);
+	val = (int) ((double) val * 0.1231 - 0.3344);
 	//printf("2 debug val: %d\n", val);
 	// Clipping. Veure més avall.
-	//val = d->Clip[val + 128];
+	val = d->Clip[val + 128];
 	//printf("3 debug val: %d\n", val);
-	// Prova map
+	// Prova map. Funciona bé a nivell de grisos
+	/*
 	if(cc == 0){
 		val = (int) ((double) val * 0.06225 + 127.5);
 	} else {
 		val = (int) ((double) val * 0.06225 + 127.5);
 		val = val / 4;
 	}
+	*/
 		//val = val * 0.1;
 	//printf("5 debug val: %d\n", val);
 	// Ho poso a lloc
@@ -551,26 +553,35 @@ static void Add_Block(int comp, int bx, int by, int dct_type, int MBA)
 				//iincr = (Coded_Picture_Width<<1) - 8;
 				// Robert
 				bx = bx >> 3; by = by >> 3;
-				pos = (d->Coded_Picture_Width >> 3)*(by+((comp&2)>>1)) + bx + ((comp&1)<<3);
-				pos = pos >> 3;
+				pos = (d->Coded_Picture_Width >> 3)*(by+((comp&2)>>1)) + bx + ((comp&1));
 				addToThumbnail(comp, cc, pos);
 				// M 'invento el bottom field
+				/*
 				pos = pos + (d->Coded_Picture_Width>>3);
 				if(pos < d->thumbnail[cc].size()){
 					addToThumbnail(comp, cc, pos);
 				}
+				*/
 			}
 			else
 			{
 				/* frame DCT coding */
 				//rfp = current_frame[0]
-				//					+ Coded_Picture_Width*(by+((comp&2)<<2)) + bx + ((comp&1)<<3);
+				//	+ Coded_Picture_Width*(by+((comp&2)<<2)) + bx + ((comp&1)<<3);
 				//iincr = Coded_Picture_Width - 8;
 				// Robert
 				bx = bx >> 3; by = by >> 3;
-				//printf("comp: %d, (%d, %d)\n", comp, bx, by);
 				pos = (d->Coded_Picture_Width >> 3)*(by+((comp&2)>>1)) + bx + ((comp&1));
 				addToThumbnail(comp, cc, pos);
+				/*
+				pos = (d->Coded_Picture_Width )*(by+((comp&2)<<2)) + bx + ((comp&1)<<3);
+				by = pos / (d->Coded_Picture_Width );
+				bx = pos % (d->Coded_Picture_Width );
+				by = by >> 3;
+				bx = bx >> 3;
+				pos = (d->Coded_Picture_Width >> 3) * by + bx;
+				addToThumbnail(comp, cc, pos);
+				*/
 			}
 		}
 		else
@@ -580,9 +591,8 @@ static void Add_Block(int comp, int bx, int by, int dct_type, int MBA)
 			//					+ (Coded_Picture_Width<<1)*(by+((comp&2)<<2)) + bx + ((comp&1)<<3);
 			//iincr = (Coded_Picture_Width<<1) - 8;
 			// Robert
-			pos = (d->Coded_Picture_Width<<1)*(by+((comp&2)<<2)) + bx +
-					((comp&1)<<3);
-			pos = pos >> 3;
+			bx = bx >> 3; by = by >> 3;
+			pos = (d->Coded_Picture_Width >> 3)*(by+((comp&2)>>1))+bx+((comp&1));
 			addToThumbnail(comp, cc, pos);
 			// M 'invento el bottom field
 			pos = pos + (d->Coded_Picture_Width>>3);
@@ -594,21 +604,25 @@ static void Add_Block(int comp, int bx, int by, int dct_type, int MBA)
 	else
 	{
 		/* chrominance */
-		// Robert test
-		/*
+		// Robert Mega Shortcut. Només faig servir les dos primeres
+		// components de color encara que n'hi pugui haver moltes més.
 		if(comp == 4 || comp == 5){
-			// Robert
 			bx = bx >> 3; by = by >> 3;
 			//printf("comp: %d, (%d, %d)\n", comp, bx, by);
-			pos = (d->Coded_Picture_Width >> 3)*(by+((comp&2)>>1)) + bx + ((comp&1));
+			pos = (d->Coded_Picture_Width >> 3)*by + bx;
 			addToThumbnail(comp, cc, pos);
 			addToThumbnail(comp, cc, pos + 1);
 			addToThumbnail(comp, cc, pos + (d->Coded_Picture_Width >> 3));
 			addToThumbnail(comp, cc, pos + (d->Coded_Picture_Width >> 3) + 1);
-
+			// M'invento el bottom field
+			if (d->picture_structure != FRAME_PICTURE){
+				pos +=  ((d->Coded_Picture_Width >> 3) << 1);
+				addToThumbnail(comp, cc, pos);
+				addToThumbnail(comp, cc, pos + 1);
+				addToThumbnail(comp, cc, pos + (d->Coded_Picture_Width >> 3));
+				addToThumbnail(comp, cc, pos + (d->Coded_Picture_Width >> 3) + 1);
+			}
 		}
-		*/
-
 		// scale coordinates
 		/*
 		if (chroma_format!=CHROMA444){
@@ -748,7 +762,7 @@ int Inverse_Table_6_9[8][4]
   {117579, 136230, 16907, 35559}  /* SMPTE 240M (1987) */
 };
 
-void YUV_to_RGB(unsigned char yp, unsigned char up, unsigned char vp,
+void YUV_to_RGB_wikipedia(unsigned char yp, unsigned char up, unsigned char vp,
 		unsigned char *r, unsigned char *g, unsigned char *b)
 {
 	double y, u ,v;
@@ -765,7 +779,7 @@ void YUV_to_RGB(unsigned char yp, unsigned char up, unsigned char vp,
 	*b = (unsigned char) ((tmp > 255) ? 255 : ((tmp < 0) ? 0 : tmp));
 }
 
-void YUV_to_RGB_official(unsigned char yp, unsigned char up, unsigned char vp,
+void YUV_to_RGB(unsigned char yp, unsigned char up, unsigned char vp,
 		unsigned char *r, unsigned char *g, unsigned char *b)
 {
 	int crv, cbu, cgu, cgv;

@@ -186,6 +186,10 @@ static void Initialize_Decoder()
   for (i=-384; i<640; i++)
     Clip[i] = (i<0) ? 0 : ((i>255) ? 255 : i);
 
+  // Robert prova
+  for(i = -384; i < 640; i++){
+	  printf("Clip[%d] %d\n", i, Clip[i]);
+  }
   /* IDCT */
   if (Reference_IDCT_Flag)
     Initialize_Reference_IDCT();

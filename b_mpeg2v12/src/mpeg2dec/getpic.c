@@ -426,6 +426,7 @@ int comp,bx,by,dct_type,addflag;
   int cc,i, j, iincr;
   unsigned char *rfp;
   short *bp;
+  static int robertFirstTime = 1;
 
   
   /* derive color component index */
@@ -496,6 +497,14 @@ int comp,bx,by,dct_type,addflag;
 
   bp = ld->block[comp];
 
+  if(robertFirstTime){
+	robertFirstTime = 0;
+	for(i = 0; i < 1024; i++){
+	  printf("Clip[%d] %d\n", i, Clip[i]);
+	}
+  }
+
+
   if (addflag)
   {
     for (i=0; i<8; i++)
@@ -515,9 +524,10 @@ int comp,bx,by,dct_type,addflag;
     {
       for (j=0; j<8; j++){
         //*rfp++ = Clip[*bp++ + 128];
-    	  *rfp = Clip[*bp + 128];
+    	*rfp = Clip[*bp + 128];
         if(cc == 0 && i == 0 && j == 0){
-        	printf("*bp: %d, Clip[*bp + 128]: %d\n", *bp, Clip[*bp + 128]);
+        	printf("*bp: %d, *bp+128: %d, Clip: %d\n", *bp,
+        			*bp + 128, Clip[*bp+128]);
         }
         rfp++;
         bp++;
@@ -810,6 +820,7 @@ int dct_type;
   int bx, by;
   int comp;
   int mitja, i;
+  short robert;
 
   /* derive current macroblock position within picture */
   /* ISO/IEC 13818-2 section 6.3.1.6 and 6.3.1.7 */
@@ -834,7 +845,7 @@ int dct_type;
     if (Two_Streams && enhan.scalable_mode==SC_SNR)
       Sum_Block(comp); /* add SNR enhancement layer data to base layer */
 
-    //printf("Before sat %d\n", ld->block[comp][0]);
+    robert = ld->block[comp][0];
 
     /* MPEG-2 saturation and mismatch control */
     /* base layer could be MPEG-1 stream, enhancement MPEG-2 SNR */
@@ -842,20 +853,24 @@ int dct_type;
     if ((Two_Streams && enhan.scalable_mode==SC_SNR) || ld->MPEG2_Flag)
       Saturate(ld->block[comp]);
 
+    //printf("Before/After sat %d, %d\n", robert,  ld->block[comp][0]);
+    robert = ld->block[comp][0];
+
     //printf("After sat %d\n", ld->block[comp][0]);
     /* ISO/IEC 13818-2 section Annex A: inverse DCT */
     //if (Reference_IDCT_Flag)
     //Reference_IDCT(ld->block[comp]); // No funciona!
     //else
       Fast_IDCT(ld->block[comp]);
-      
+    /**/
     mitja = 0;
     for(i = 0; i < 64; i++){
 		mitja += ld->block[comp][i];
     }
     //ML_log("Mitja[%d]: %d\n", comp, mitja/64);
-    printf("Mitja[%d]: %d\n", comp, mitja/64);
-    
+    printf("Mitja[%d]: %d, %d aprox.\n", comp, mitja/64,
+    		(int)((double)robert * 0.1231));
+    /**/
     /* ISO/IEC 13818-2 section 7.6.8: Adding prediction and coefficient data */
     Add_Block(comp,bx,by,dct_type,(macroblock_type & MACROBLOCK_INTRA)==0);
   }

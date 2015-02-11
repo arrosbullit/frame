@@ -187,10 +187,11 @@ struct MPEG2_parsed
 	int intra_slice;
 	short block[12][64];
 		
-	// More stuff. TODO: Mirar on alliberes aquesta mem
+	//TODO: Mirar on alliberes aquesta mem
 	std::vector<unsigned char> current_frame[3];
 	std::vector<unsigned char> thumbnail[3];
-	std::vector<unsigned char> Clip;
+	std::vector<unsigned char> ClipVec;
+	unsigned char *Clip; // Aquest apunta a ClipVec -> No alliberar
 	
 	/* decoder operation control flags */
 	int Quiet_Flag;

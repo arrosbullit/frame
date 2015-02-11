@@ -21,6 +21,20 @@ const char TARGET_FILENAME[] =
 const unsigned TS_PACKET_HEADER_LENGTH = 4;
 const unsigned TS_PACKET_SIZE = 188;
 
+int savePicToFile(vector<unsigned char> &buf){
+	FILE *outFile;
+	outFile = fopen("extracted_pic.m2v", "wb");
+	if(!outFile){
+		printf("Cound not open out file\n");
+		return BTV_ERR_GENERIC;
+	}
+	int written = fwrite(&buf[0], 1, buf.size(), outFile);
+	if(written != buf.size()){
+		printf("Error writing to file");
+	}
+	fclose(outFile);
+	return BTV_NO_ERROR;
+}
 
 #ifndef TEST_ALL_FUNCS
 // Here I test only the exported function while below
@@ -29,7 +43,9 @@ const unsigned TS_PACKET_SIZE = 188;
 // by changing the static keyword in the code.
 int main() {
 	vector<unsigned char> bigBuf;
-	unsigned PID =  0x02d0;
+	//unsigned PID =  0x02d0;
+	unsigned PID =  0x0244;
+
 	int re;
 	// Test the only exported function.
 	printf("Test getCodedImageFromFile\n");
@@ -49,6 +65,7 @@ int main() {
 		printf("Pic size: %u\n", bigBuf.size());
 		printf("SUCCESS test getCodedImageFromFile\n");
 	}
+	savePicToFile(bigBuf);
 
 	// The End
 	printf("Press return to finish\n");
@@ -83,21 +100,6 @@ __int64 getFileSize(FILE *inputFile)
 	fileSize =  _ftelli64(inputFile);
 	_fseeki64(inputFile, savedPos, SEEK_SET);
 	return fileSize;
-}
-
-int savePicToFile(vector<unsigned char> &buf){
-	FILE *outFile;
-	outFile = fopen("extracted_pic.m2v", "wb");
-	if(!outFile){
-		printf("Cound not open out file\n");
-		return BTV_ERR_GENERIC;
-	}
-	int written = fwrite(&buf[0], 1, buf.size(), outFile);
-	if(written != buf.size()){
-		printf("Error writing to file");
-	}
-	fclose(outFile);
-	return BTV_NO_ERROR;
 }
 
 int main() {

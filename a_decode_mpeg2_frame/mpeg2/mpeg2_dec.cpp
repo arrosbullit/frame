@@ -134,16 +134,21 @@ void Initialize_Decoder()
 	//if (!(Clip=(unsigned char *)malloc(1024)))
 	//	Error("Clip[] malloc failed\n");
 
-	if(d->Clip.size() >= 1024){
+	if(d->ClipVec.size() >= 1024){
 		return;
 	}
-	d->Clip.resize(1024);
+	d->ClipVec.resize(1024);
 
-	unsigned char *Clip = &(d->Clip[0]);
-	Clip += 384;
+	d->Clip = &(d->ClipVec[0]);
+	d->Clip += 384;
 
 	for (i=-384; i<640; i++){
-		Clip[i] = (i<0) ? 0 : ((i>255) ? 255 : i);
+		d->Clip[i] = (i<0) ? 0 : ((i>255) ? 255 : i);
+	}
+
+	// Robert prova
+	for (i = -384; i < 640; i++) {
+		printf("Clip[%d] %d\n", i, d->Clip[i]);
 	}
 
 	/* IDCT */
@@ -151,7 +156,6 @@ void Initialize_Decoder()
 	//	Initialize_Reference_IDCT();
 	//else
 	//	Initialize_Fast_IDCT();
-
 }
 
 }; // namespace MPEG2
