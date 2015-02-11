@@ -1,7 +1,7 @@
 /*!
 	@file		mini_logger.h
 	@brief		
-	@author		Robert Lluís, 2015
+	@author		Robert LluÃ­s, 2015
 	@note		
 */
 #ifndef __MINI_LOGGER_H__

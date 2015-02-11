@@ -1,10 +1,9 @@
-//============================================================================
-// Name        : e_lnx_extract_img_from_ts_v2.cpp
-// Author      : 
-// Version     :
-// Copyright   : Your copyright notice
-// Description : Hello World in C++, Ansi-style
-//============================================================================
+/*!
+	@file		extract_coded_image_from_ts.cpp
+	@brief		Extracts a coded image from a TS file.
+	@author		Robert Lluís, 2015
+	@note
+*/
 
 #define _LARGEFILE64_SOURCE
 #define _FILE_OFFSET_BITS 64
@@ -21,9 +20,6 @@ using namespace std;
 	#define _fseeki64 fseeko
 #endif
 
-const char TARGET_FILENAME[] =
-	"/media/sf_win_robert/Streams/test_suite_dc_at_11Mbps_in_mux_at_31Mbps.ts";
-
 const unsigned TS_PACKET_HEADER_LENGTH = 4;
 const unsigned TS_PACKET_SIZE = 188;
 
@@ -36,185 +32,24 @@ const unsigned TS_PACKET_SIZE = 188;
 	#define PRINT(A)
 #endif
 
-static __int64 getFileSize(FILE* inputFile);
-static int getNextPacketOfTargetPid(unsigned char packet[188]);
-static int hasPusi(unsigned char packet[188]);
-static void getPayload(unsigned char packet[188], vector<unsigned char> &payload);
-static int getNextPayloadOfTargetPid(vector<unsigned char> &payload);
-static int appendChunkToBuffer(vector<unsigned char> &buf);
-static int goToNextPusi();
-static int getSequenceHeaderIdx(vector<unsigned char> &buf);
-static int getPicIdx(vector<unsigned char> &buf, unsigned startIdx);
-static int getPic(vector<unsigned char> &buf);
-static int savePicToFile(vector<unsigned char> &buf);
-
 
 using namespace std;
 
-unsigned PID = 0x02d0;
-FILE *inputFile;
-
-int main() {
-	__int64 fileSize;
-	int re;
-	unsigned char packet[188];
-	vector<unsigned char> payload;
-	inputFile = fopen(TARGET_FILENAME, "rb");
-	if(!inputFile){
-		printf("Error by fopen. Press Return.\n");
-		getchar();
-		return 0;
-	}
-	fileSize = getFileSize(inputFile);
-	printf("File size %lld bytes, %lld packets\n", fileSize,
-			fileSize/TS_PACKET_SIZE);
-	// Test goToNextPacket
-	printf("Test goToNextPacket()\n");
-	re = goToNextPacket(inputFile);
-	if(re){
-		printf("Error by goToNextPacket()\n");
-	} else {
-		printf("SUCCESS goToNextPacket()\n");
-	}
-	// Test getNextPacketOfTargetPid
-	printf("Test getNextPacketOfTargetPid\n");
-	re = getNextPacketOfTargetPid(packet);
-	if(re){
-		printf("Error by getNextPacketOfTargetPid\n");
-	} else {
-		printf("SUCCESS getNextPacketOfTargetPid()\n");
-	}
-	// Test hasPusi
-	printf("Test hasPusi()\n");
-	while(1){
-		re = getNextPacketOfTargetPid(packet);
-		if(re){
-			printf("Error by getNextPacketOfTargetPid()\n");
-			break;
-		}
-		if(hasPusi(packet)){
-			printf("PUSI found\n");
-			printf("SUCCESS hasPusi\n");
-			break;
-		}
-	}
-	// Test getPayload
-	printf("Test getPayload\n");
-	do{
-		re = getNextPacketOfTargetPid(packet);
-		if(re){
-			printf("2 Error by getNextPacketOfTargetPid()\n");
-
-		}
-		getPayload(packet, payload);
-		if(!payload.size()){
-			printf("Error by getPayload()\n");
-		} else {
-			printf("SUCCESS getPayload()\n");
-		}
-	}while(0);
-	// Test goToNextPusi()
-	printf("Test goToNextPusi()\n");
-	do{
-		printf("Call goToNextPusi()\n");
-		re = goToNextPusi();
-		if(re){
-			printf("FAILED test goToNextPusi(). Error by goToNextPusi.\n");
-			break;
-		}
-		printf("Call getNextPacketOfTargetPid()\n");
-		re = getNextPacketOfTargetPid(packet);
-		if(re){
-			printf("FAILED test goToNextPusi(). Error by getNextPacketOfTargetPid.\n");
-			break;
-		}
-		if(!hasPusi(packet)){
-			printf("FAILED test goToNextPusi(). PUSI not found.\n");
-			break;
-		}
-		printf("SUCCESS goToNextPussi\n");
-
-	} while(0);
-	// Test appendChunkToBuffer
-	printf("Test appendChunkToBuffer\n");
-	vector<unsigned char> bigBuf;
-	re = appendChunkToBuffer(bigBuf);
-	if(re){
-		printf("FAILED appendChunkToBuffer(bigBuf)\n");
-	} else {
-		printf("Buf size: %lu\n", bigBuf.size());
-		if(bigBuf.size() < 4096){
-			printf("FAILED appendChunkToBuffer(). Error in buf size.\n");
-		} else {
-			printf("SUCCESS appendChunkToBffer()\n");
-		}
-	}
-	// Test getSequenceHeaderIdx
-	printf("Test getSequenceHeaderIdx\n");
-	do{
-		re = goToNextPusi();
-		if(re){
-			printf("FAILED Error by goToNextPusi.\n");
-			break;
-		}
-		bigBuf.clear();
-		re = appendChunkToBuffer(bigBuf);
-		if(re){
-			printf("FAILED Error by appendChunkToBuffer(bigBuf).\n");
-			break;
-		}
-		re = getSequenceHeaderIdx(bigBuf);
-		if(re < 0){
-			printf("FAILED Error by getSequenceHeaderIdx");
-			break;
-		}
-		printf("Index of seq header in buf: %d\n", re);
-		printf("SUCCESS getSequenceHeaderIdx!!\n");
-
-	} while(0);
-	// Test getPicIdx
-	// This test reuses the previous bibBuf which must be filled with data
-	re = getPicIdx(bigBuf, 0);
-	if(re < 0){
-		printf("FAILED getPicIdx\n");
-	} else {
-		printf("Index of pic start: %d\n", re);
-		printf("SUCCESS getPicIdx\n");
-	}
-	// Test get pic
-	re = getPic(bigBuf);
-	if(re){
-		printf("FAILED getPic\n");
-	} else {
-		printf("Pic size: %d\n", bigBuf.size());
-		printf("SUCCEEDED getPic\n");
-		savePicToFile(bigBuf);
-	}
-	// Test all pic sizes
-	do{
-		re = getPic(bigBuf);
-		if(!re){
-			printf("Pic size: %d\n", bigBuf.size());
-		}
-	}while(!re);
-
-	// The End
-	printf("Press return to finish\n");
-	getchar();
-	printf("Bye!");
-	return 0;
-}
-
-__int64 getFileSize(FILE* inputFile)
-{
-	__int64 fileSize;
-	__int64 savedPos;
-	savedPos = _ftelli64(inputFile);
-	_fseeki64(inputFile, 0, SEEK_END);
-	fileSize =  _ftelli64(inputFile);
-	_fseeki64(inputFile, savedPos, SEEK_SET);
-	return fileSize;
-}
+#define STATIC static
+//#define STATIC
+// Funcs
+STATIC int getNextPacketOfTargetPid(unsigned char packet[188]);
+STATIC int hasPusi(unsigned char packet[188]);
+STATIC void getPayload(unsigned char packet[188], vector<unsigned char> &payload);
+STATIC int getNextPayloadOfTargetPid(vector<unsigned char> &payload);
+STATIC int appendChunkToBuffer(vector<unsigned char> &buf);
+STATIC int goToNextPusi();
+STATIC int getSequenceHeaderIdx(vector<unsigned char> &buf);
+STATIC int getPicIdx(vector<unsigned char> &buf, unsigned startIdx);
+STATIC int getPic(vector<unsigned char> &buf);
+// Vars
+STATIC unsigned PID;
+STATIC FILE *inputFile;
 
 // Appends a chunk of payloads to the buffer argument.
 // The size of the chunk will be above 4KB. It cannot be
@@ -369,7 +204,6 @@ int getPic(vector<unsigned char> &retBuf)
 {
 	int re;
 	int firstPicIdx;
-	int secondPicIdx;
 	int seqHeaderIdx;
 	vector<unsigned char> buf;
  	retBuf.clear();
@@ -415,18 +249,23 @@ int getPic(vector<unsigned char> &retBuf)
 	return BTV_ERR_GENERIC;
 }
 
-int savePicToFile(vector<unsigned char> &buf){
-	FILE *outFile;
-	outFile = fopen("extracted_pic.m2v", "wb");
-	if(!outFile){
-		PRINT("Cound not open out file\n");
+int getCodedImageFromFile(const char *fileName,
+		unsigned pid,
+		std::vector<unsigned char> &buf)
+{
+	int re;
+	PID = pid;
+	inputFile = fopen(fileName, "rb");
+	if(!inputFile){
 		return BTV_ERR_GENERIC;
 	}
-	int written = fwrite(&buf[0], 1, buf.size(), outFile);
-	if(written != buf.size()){
-		PRINT("Error writing to file");
+	re = getPic(buf);
+	if(re){
+		fclose(inputFile);
+		return BTV_ERR_GENERIC;
 	}
-	fclose(outFile);
+	fclose(inputFile);
 	return BTV_NO_ERROR;
 }
+
 

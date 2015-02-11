@@ -1,7 +1,7 @@
 /*!
 	@file		mini_logger.cpp
 	@brief		
-	@author		Robert Lluís, 2015
+	@author		Robert LluÃ­s, 2015
 	@note		
 */
 
