@@ -2,6 +2,6 @@
 #define __THUMBNAILER_H__
 
 // Returns zero if success.
-int doThumbnail(const char *inFile, unsigned pid, const char* outFile);
+int doThumbnail(const char *inFileName, unsigned pid, const char* outFileName);
 
 #endif
