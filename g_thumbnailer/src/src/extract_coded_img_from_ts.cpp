@@ -26,7 +26,7 @@ const unsigned TS_PACKET_SIZE = 188;
 #define SEQUENCE_HEADER_CODE    0x1B3
 #define PICTURE_START_CODE      0x100
 
-#ifdef DEBUG
+#ifdef TRACE
 	#define PRINT(A) printf(A);
 #else
 	#define PRINT(A)
@@ -277,8 +277,39 @@ int getCodedImageFromFile(const char *fileName,
 		fclose(inputFile);
 		return BTV_ERR_GENERIC;
 	}
+	fclose(inputFile);
+	#ifdef TRACE
 	printf("Debug coded image size: %d\n", buf.size());
+	#endif
 	return BTV_NO_ERROR;
 }
 
+int openInputFile(const char *fileName)
+{
+	inputFile = fopen(fileName, "rb");
+	if(!inputFile){
+		return BTV_ERR_GENERIC;
+	}
+	return BTV_NO_ERROR;
+}
+
+int getCodedImage(unsigned pid,
+		std::vector<unsigned char> &buf)
+{
+	int re;
+	PID = pid;
+	re = getPic(buf);
+	if(re){
+		return BTV_ERR_GENERIC;
+	}
+	#ifdef TRACE
+	printf("Debug coded image size: %d\n", buf.size());
+	#endif
+	return BTV_NO_ERROR;
+}
+
+void closeInputFile()
+{
+	fclose(inputFile);
+}
 

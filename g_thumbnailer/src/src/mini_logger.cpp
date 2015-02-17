@@ -41,7 +41,6 @@ void ML_closeFile()
 	fclose(file);
 }
 
-/*
 const char* ML_readLine()
 {
 	char c;
@@ -65,4 +64,3 @@ const char* ML_readLine()
 		str.push_back(c);
 	}
 }
-*/

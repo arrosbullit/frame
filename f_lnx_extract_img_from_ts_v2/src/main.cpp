@@ -16,8 +16,26 @@
 
 using namespace std;
 
-const char TARGET_FILENAME[] =
-	"/media/sf_win_robert/Streams/test_suite_dc_at_11Mbps_in_mux_at_31Mbps.ts";
+//const char TARGET_FILENAME[] = "/media/sf_win_robert/Streams/test_suite_dc_at_11Mbps_in_mux_at_31Mbps.ts";
+//unsigned PID_main =  0x02d0; // Good
+//unsigned PID_main =  0x0244; // Good
+const char TARGET_FILENAME[] = "/media/sf_win_robert/Streams/BBC/Mux4_18_11_14_10min.ts";
+//unsigned PID_main =  0x65; // Good
+//unsigned PID_main =  0x12d; // Mitja imatge
+//unsigned PID_main =  0xc9; // No va
+//unsigned PID_main =  0x0191; // Mitja imatge, arreglable amb la segona imatge ??
+//unsigned PID_main =  0x01F5; // Mitja imatge, Arreglable si agafo la segona pic??
+//unsigned PID_main =  0x0907; // Bé
+//unsigned PID_main =  0x0a97; // Mitja imatge
+//unsigned PID_main =  0x0b55; // Mitja imatge
+//unsigned PID_main =  0x083f; // Bé
+//unsigned PID_main =  0x0af1; // Bé
+//unsigned PID_main =  0x0849; // Mitja imatge
+//unsigned PID_main =  0x026d; // Bé
+unsigned PID_main =  0x08fd; // Mitja imatge
+//unsigned PID_main =  0x0961; // Bé
+
+
 const unsigned TS_PACKET_HEADER_LENGTH = 4;
 const unsigned TS_PACKET_SIZE = 188;
 
@@ -43,13 +61,11 @@ int savePicToFile(vector<unsigned char> &buf){
 // by changing the static keyword in the code.
 int main() {
 	vector<unsigned char> bigBuf;
-	//unsigned PID =  0x02d0;
-	unsigned PID =  0x0244;
 
 	int re;
 	// Test the only exported function.
 	printf("Test getCodedImageFromFile\n");
-	re = getCodedImageFromFile(TARGET_FILENAME, PID, bigBuf);
+	re = getCodedImageFromFile(TARGET_FILENAME, PID_main, bigBuf);
 	if(re){
 		printf("FAILED test getCodedImageFromFile\n");
 	} else {
@@ -57,14 +73,16 @@ int main() {
 		printf("SUCCESS test getCodedImageFromFile\n");
 	}
 	// Run the same test again
+	/*
 	printf("Test getCodedImageFromFile\n");
-	re = getCodedImageFromFile(TARGET_FILENAME, PID, bigBuf);
+	re = getCodedImageFromFile(TARGET_FILENAME, PID_main, bigBuf);
 	if(re){
 		printf("FAILED test getCodedImageFromFile\n");
 	} else {
 		printf("Pic size: %u\n", bigBuf.size());
 		printf("SUCCESS test getCodedImageFromFile\n");
 	}
+	*/
 	savePicToFile(bigBuf);
 
 	// The End
@@ -108,7 +126,7 @@ int main() {
 	unsigned char packet[188];
 	vector<unsigned char> payload;
 	// This pid will be used all over
-	PID = 0x02d0;
+	PID = PID_main;
 	inputFile = fopen(TARGET_FILENAME, "rb");
 	if(!inputFile){
 		printf("Error by fopen. Press Return.\n");

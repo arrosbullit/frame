@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <vector>
 #include "mpeg2_dec.h"
-#include "mpeg2_gethdr.h"
+//#include "mpeg2_gethdr.h"
 #include "mini_logger.h"
 
 using namespace std;
@@ -15,16 +15,17 @@ int main()
 	vector<unsigned char> vec;
 	unsigned char c;
 	int read;
+	int ret;
 	CLittle_Bitstream bits;
 
-	ML_openFile("my_log.txt", "wb");
+	ML_openFile("mpeg2_log.txt", "wb");
 
 	file = fopen(FILE_NAME, "rb");
 	if(!file){
-		printf("Cannot open %s\n", FILE_NAME);
-		printf("Press return to finish\n");
+		printf("Main: Cannot open %s\n", FILE_NAME);
+		printf("Main: Press return to finish\n");
 		getchar();
-		printf("Bye!");
+		printf("Main: Bye!");
 	}
 
 	for(;;){
@@ -38,15 +39,20 @@ int main()
 	bits.init(&vec[0], vec.size());
 
 
-
 	MPEG2::Initialize_Decoder();
-	MPEG2::Decode_Bitstream(&bits);
+	ret = MPEG2::Decode_Bitstream(&bits);
+	printf("Decode_Bitstream: %d\n", ret);
+	if(ret == 1){
+		ret = MPEG2::write_ppm_file("thumb.ppm");
+		printf("write_ppm_file: %d\n", ret);
+	}
+	MPEG2::Uninitialize_Decoder();
 
-	printf("Size read %d\n", vec.size());
+	printf("Main: Size read %d\n", vec.size());
 
 	ML_closeFile();
 
-	printf("Press return to finish\n");
+	printf("Main: Press return to finish\n");
 	getchar();
 	printf("Bye!");
 	return 0;

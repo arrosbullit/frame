@@ -5,6 +5,7 @@
 
 /*
  * Disclaimer of Warranty
+
  *
  * These software programs are available to the user without any license fee or
  * royalty on an "as is" basis.  The MPEG Software Simulation Group disclaims
@@ -27,6 +28,14 @@
  * design.
  *
  */
+
+/*
+
+/home/robert/eclipse_workspace/f_lnx_extract_img_from_ts_v2/extracted_pic.m2v
+
+
+
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -186,10 +195,6 @@ static void Initialize_Decoder()
   for (i=-384; i<640; i++)
     Clip[i] = (i<0) ? 0 : ((i>255) ? 255 : i);
 
-  // Robert prova
-  for(i = -384; i < 640; i++){
-	  printf("Clip[%d] %d\n", i, Clip[i]);
-  }
   /* IDCT */
   if (Reference_IDCT_Flag)
     Initialize_Reference_IDCT();

@@ -404,7 +404,7 @@ int dc_dct_pred[];
       if (!Quiet_Flag)
         fprintf(stderr,"DCT coeff index (i) out of bounds (intra2)\n");
         ML_log("DCT coeff index (i) out of bounds (intra2)\n");
-      Fault_Flag = 1;
+        Fault_Flag = 1;
       return;
     }
 
